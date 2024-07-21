@@ -6,6 +6,7 @@ import aiofiles
 import random
 import requests
 import os
+import paramiko
 
 # 从环境变量中获取 Telegram Bot Token 和 Chat ID
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
@@ -22,6 +23,38 @@ browser = None
 
 # telegram消息
 message = 'serv00&ct8自动化脚本运行\n'
+
+
+def log(username, password):
+    # 远程服务器的地址、用户名和密码
+    hostname = 'web7.serv00.com'
+
+    # 创建一个 SSH 客户端
+    ssh_client = paramiko.SSHClient()
+
+    # 自动添加主机密钥（注意：在生产环境中不建议这样做，应该手动添加主机密钥）
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    try:
+        # 连接到远程服务器
+        ssh_client.connect(hostname=hostname, username=username, password=password)
+
+        # 执行命令并分配一个伪终端
+        command = 'screen -S vless node /home/jkhlgjfkds/domains/jkhlgjfkds.serv00.net/vless/app.js'
+        stdin, stdout, stderr = ssh_client.exec_command(command, get_pty=True)
+
+        # 读取命令输出
+        output = stdout.read().decode('utf-8')
+        error = stderr.read().decode('utf-8')
+
+        # 打印输出和错误信息
+        return output
+        if error:
+            return error
+    finally:
+        # 关闭 SSH 连接
+        ssh_client.close()
+
 
 async def login(username, password, panel):
     global browser
@@ -85,12 +118,13 @@ async def main():
 
         serviceName = 'ct8' if 'ct8' in panel else 'serv00'
         is_logged_in = await login(username, password, panel)
+        massage_inf = log(username, password)
 
         if is_logged_in:
             now_utc = format_to_iso(datetime.utcnow())
             now_beijing = format_to_iso(datetime.utcnow() + timedelta(hours=8))
             success_message = f'{serviceName}账号 {username} 于北京时间 {now_beijing}（UTC时间 {now_utc}）登录成功！'
-            message += success_message + '\n'
+            message += success_message + '\n'+massage_inf+'\n'
             print(success_message)
         else:
             message += f'{serviceName}账号 {username} 登录失败，请检查{serviceName}账号和密码是否正确。\n'
