@@ -46,7 +46,6 @@ def log(username, password):
         # 读取命令输出
         output = stdout.read().decode('utf-8')
         error = stderr.read().decode('utf-8')
-
         # 打印输出和错误信息
         return output
         if error:
@@ -119,6 +118,10 @@ async def main():
         serviceName = 'ct8' if 'ct8' in panel else 'serv00'
         is_logged_in = await login(username, password, panel)
         massage_inf = log(username, password)
+        if 'listen' in output and '5325' in massage_inf:
+             massage_inf = 'ssh链接启动vless成功'
+        else:
+            massage_inf = 'ssh链接启动vless失败'
 
         if is_logged_in:
             now_utc = format_to_iso(datetime.utcnow())
