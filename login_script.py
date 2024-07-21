@@ -12,11 +12,14 @@ import paramiko
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
+
 def format_to_iso(date):
     return date.strftime('%Y-%m-%d %H:%M:%S')
 
+
 async def delay_time(ms):
     await asyncio.sleep(ms / 1000)
+
 
 # 全局浏览器实例
 browser = None
@@ -98,6 +101,7 @@ async def login(username, password, panel):
         if page:
             await page.close()
 
+
 async def main():
     global message
     message = 'serv00&ct8自动化脚本运行\n'
@@ -118,15 +122,15 @@ async def main():
         serviceName = 'ct8' if 'ct8' in panel else 'serv00'
         is_logged_in = await login(username, password, panel)
         massage_inf = log(username, password)
-        if 'listen' in output and '5325' in massage_inf:
-             massage_inf = 'ssh链接启动vless成功'
+        if 'listen' in massage_inf and '5325' in massage_inf:
+            massage_inf = 'ssh链接启动vless成功'
         else:
             massage_inf = 'ssh链接启动vless失败'
 
         if is_logged_in:
             now_utc = format_to_iso(datetime.utcnow())
             now_beijing = format_to_iso(datetime.utcnow() + timedelta(hours=8))
-            success_message = f'{serviceName}账号 {username} 于北京时间 {now_beijing}（UTC时间 {now_utc}）登录成功！'+massage_inf+'\n'
+            success_message = f'{serviceName}账号 {username} 于北京时间 {now_beijing}（UTC时间 {now_utc}）登录成功！' + massage_inf + '\n'
             message += success_message + '\n'
             print(success_message)
         else:
@@ -135,10 +139,11 @@ async def main():
 
         delay = random.randint(1000, 8000)
         await delay_time(delay)
-        
+
     message += f'所有{serviceName}账号登录完成！'
     await send_telegram_message(message)
     print(f'所有{serviceName}账号登录完成！')
+
 
 async def send_telegram_message(message):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -165,6 +170,7 @@ async def send_telegram_message(message):
             print(f"发送消息到Telegram失败: {response.text}")
     except Exception as e:
         print(f"发送消息到Telegram时出错: {e}")
+
 
 if __name__ == '__main__':
     asyncio.run(main())
