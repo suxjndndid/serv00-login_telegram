@@ -22,8 +22,10 @@ jobs:
 
       - name: Create accounts.json from environment variable
         run: echo "$ACCOUNTS_JSON" > accounts.json
+             ech0"$WECHAT_PUSH_JSON"> wechat_push.json
         env:
             ACCOUNTS_JSON: ${{ secrets.ACCOUNTS_JSON }}  # 从GitHub Secrets中获取环境变量
+            WECHAT_PUSH_JSON: ${{ secrets.WECHAT_PUSH_JSON }}
 
       - name: 安装依赖
         run: |
@@ -31,11 +33,14 @@ jobs:
           pip install pyppeteer aiofiles requests
           pip install --upgrade pyppeteer
           pip install --upgrade paramiko
+          pip install --upgrade requests
+          pip install --upgrade json
 
       - name: 运行登录脚本
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ACCOUNTS_JSON: ${{ secrets.ACCOUNTS_JSON }}
+          WECHAT_PUSH_JSON: ${{ secrets.WECHAT_PUSH_JSON }}
         run: |
           python login_script.py
