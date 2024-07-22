@@ -109,23 +109,23 @@ def get_access_token():
     return access_token
 
 
-def send_massage(access_token, message):
+def send_massage(access_token, mesage_inf):
     body = {
         "touser": openId,
         "template_id": template_id.strip(),
         "url": "https://weixin.qq.com",
         "data": {
             "message": {
-                "value": message
+                "value": mesage_inf
             },
         }
     }
     url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}'.format(access_token)
     t = requests.post(url, json.dumps(body)).text
     print(t)
-def send(mesage):
+def send(mesage_inf):
     access_token = get_access_token()
-    send_massage(access_token, message)
+    send_massage(access_token, mesage_inf)
 
 
 
@@ -167,7 +167,7 @@ async def main():
             massage_inf = 'ssh链接启动vless成功'
         else:
             massage_inf = 'ssh链接启动vless失败'
-
+        send(massage_inf)
         if is_logged_in:
             now_utc = format_to_iso(datetime.utcnow())
             now_beijing = format_to_iso(datetime.utcnow() + timedelta(hours=8))
@@ -187,7 +187,6 @@ async def main():
 
 
 async def send_telegram_message(message):
-    send(massage_inf)
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
         'chat_id': TELEGRAM_CHAT_ID,
