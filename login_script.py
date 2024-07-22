@@ -27,6 +27,7 @@ browser = None
 # telegram消息
 message = 'serv00&ct8自动化脚本运行\n'
 
+global massage_inf
 
 def log(username, password):
     # 远程服务器的地址、用户名和密码
@@ -51,8 +52,6 @@ def log(username, password):
         error = stderr.read().decode('utf-8')
         # 打印输出和错误信息
         return output
-        if error:
-            return error
     finally:
         # 关闭 SSH 连接
         ssh_client.close()
@@ -100,10 +99,38 @@ async def login(username, password, panel):
     finally:
         if page:
             await page.close()
+def get_access_token():
+    # 获取access token的url
+    url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}' \
+        .format(appID.strip(), appSecret.strip())
+    response = requests.get(url)
+    response = response.json()
+    access_token = response.get('access_token')
+    return access_token
+
+
+def send_massage(access_token, message):
+    body = {
+        "touser": openId,
+        "template_id": template_id.strip(),
+        "url": "https://weixin.qq.com",
+        "data": {
+            "message": {
+                "value": message
+            },
+        }
+    }
+    url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}'.format(access_token)
+    t = requests.post(url, json.dumps(body)).text
+    print(t)
+def send(mesage):
+    access_token = get_access_token()
+    send_massage(access_token, message)
+
 
 
 async def main():
-    global message
+    global message, wechat_push_jsons
     message = 'serv00&ct8自动化脚本运行\n'
 
     try:
@@ -113,6 +140,19 @@ async def main():
     except Exception as e:
         print(f'读取 accounts.json 文件时出错: {e}')
         return
+    try:
+        with open('wechat_push.json',mode='r', encoding='utf-8') as w:
+            wechat_push_json = w.read()
+        wechat_push_jsons = json.loads(wechat_push_json)
+    except Exception as e:
+        print(f'读取失败')
+
+    for w in wechat_push_jsons:
+        global appID, appSecret, openId, template_id
+        appID = w['appID']
+        appSecret = w['appSecret']
+        openId = w['openId']
+        template_id = w['template_id']
 
     for account in accounts:
         username = account['username']
@@ -146,6 +186,7 @@ async def main():
 
 
 async def send_telegram_message(message):
+    send(massage_inf)
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
         'chat_id': TELEGRAM_CHAT_ID,
