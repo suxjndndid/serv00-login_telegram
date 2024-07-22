@@ -27,7 +27,7 @@ browser = None
 # telegram消息
 message = 'serv00&ct8自动化脚本运行\n'
 
-global massage_inf
+massage_inf = ''
 
 def log(username, password):
     # 远程服务器的地址、用户名和密码
@@ -131,6 +131,7 @@ def send(mesage):
 
 async def main():
     global message, wechat_push_jsons
+    global massage_inf
     message = 'serv00&ct8自动化脚本运行\n'
 
     try:
