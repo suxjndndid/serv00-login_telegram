@@ -35,7 +35,6 @@ jobs:
           pip install --upgrade pyppeteer
           pip install --upgrade paramiko
           pip install --upgrade requests
-          pip install --upgrade json
 
       - name: 运行登录脚本
         env:
